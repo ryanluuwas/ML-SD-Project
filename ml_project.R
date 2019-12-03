@@ -190,6 +190,8 @@ data2018$month <- as.factor(data2018$month)
 data2018$council_district <- as.factor(data2018$council_district)
 data2018$comm_plan_code <- as.factor(data2018$comm_plan_code)
 data2018$case_time <- as.factor(data2018$case_time)
+data2018$tod <- as.factor(data2018$tod)
+data2018$season <- as.factor(data2018$season)
 
 str(data2018)
 
@@ -207,6 +209,14 @@ data2018_s['p_char'] <- str_count(data2018_s$public_description)
 
 data2018_s['p_len'] <- word_count(data2018_s$public_description)
 data2018_s$p_len[is.na(data2018_s$p_len)] <- 0
+
+#remove public desciption
+data2018_s <- subset(data2018_s, select =-c(public_description))
+
+a <- lm(data2018_s$case_age_days ~ p_len, p_char, tod, data=data2018_s)
+
+sort(table(data2018_s$comm_plan_name))
+
 
 
 
