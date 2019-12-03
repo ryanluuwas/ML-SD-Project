@@ -5,6 +5,8 @@ library(ggplot2)
 library(randomForest)
 library(caret)
 library(chron)
+library(stringr)
+library(qdap)
 
 #Set work directory
 #setwd("C:/Users/Ryan Luu/Desktop/UCI/MSBA FALL '19/BANA273 - Machine Learning Analytics/Assignment 3")
@@ -17,7 +19,7 @@ data <- read.csv("get_it_done_2019_requests_datasd_v1.csv")
 
 
 #Remove unnecessary columns
-data <- subset(data, select =-c(service_request_id, service_request_parent_id, sap_notification_number, park_name, referred, date_updated, public_description))
+data <- subset(data, select =-c(service_request_id, service_request_parent_id, sap_notification_number, park_name, referred, date_updated))
 
 data$date_requested <- ymd_hms(data$date_requested)
 
@@ -104,7 +106,7 @@ data_s <- data[sample(nrow(data), 10000),]
 # 2018 dataset
 data2018 <- read.csv("get_it_done_2018_requests_datasd_v1.csv")
 
-data2018 <- subset(data2018, select =-c(service_request_id, service_request_parent_id, sap_notification_number, park_name, referred, date_updated, public_description))
+data2018 <- subset(data2018, select =-c(service_request_id, service_request_parent_id, sap_notification_number, park_name, referred, date_updated))
 
 data2018$date_requested <- ymd_hms(data2018$date_requested)
 
@@ -197,33 +199,22 @@ data2018_s <- data2018[sample(nrow(data2018), 10000),]
 
 
 
-#Load Train and Test datasets
-#Identify feature and response variable(s) and values must be numeric and numpy arrays
-#x_train <- input_variables_values_training_datasets
-#y_train <- target_variables_values_training_datasets
-#x_test <- input_variables_values_test_datasets
-#x <- cbind(x_train,y_train)
-# Train the model using the training sets and check score
-#linear <- lm(y_train ~ ., data = x)
-#summary(linear)
-#Predict Output
-#predicted= predict(linear,x_test)
 
-set.seed(1234)
-ind <- sample(2,nrow(data2018_s), replace = TRUE, prob = c(0.7,0.3))
-train <- data2018_s[ind==1,]
-test <- data2018_s[ind==2,]
 
+#Feature Engineering for word count and character length
+
+data2018_s['p_char'] <- str_count(data2018_s$public_description)
+
+data2018_s['p_len'] <- word_count(data2018_s$public_description)
+data2018_s$p_len[is.na(data2018_s$p_len)] <- 0
 
 
 
 #-------------------------------------------------------------------------------------------
 # Write CSV 
-
-
-setwd("C:/Users/Ryan Luu/Documents/GitHub/ML-SD-Project")
 write.csv(data_s, file = "ml_project_2019sample_new.csv")
 write.csv(data2018_s, file = "ml_project_2018sample_new.csv")
 
-#write.csv(data2018_s, file = "data2018_for_luis.csv")
+write.csv(data2018_s, file = "data2018_for_adam.csv")
+
 
